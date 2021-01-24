@@ -24,7 +24,7 @@ func Default() Config {
 	return Config{
 		StripePublishableKey: os.Getenv("STRIPE_PUBLISHABLE_KEY"),
 		StripeCountry:        stripeCountry,
-		Country:              "SP",
-		Currency:             "eur",
+		Country:              os.Getenv("STRIPE_ACCOUNT_COUNTRY"),
+		Currency:             "STRIPE_ACCOUNT_CURRENCY",
 	}
 }

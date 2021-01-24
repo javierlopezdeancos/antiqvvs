@@ -2,25 +2,50 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path"
 
-	"github.com/stripe/stripe-go"
-	"github.com/stripe/stripe-go/product"
-	"github.com/stripe/stripe-go/v71/price"
+	"github.com/joho/godotenv"
+	"github.com/stripe/stripe-go/v72"
+	"github.com/stripe/stripe-go/v72/price"
+	"github.com/stripe/stripe-go/v72/product"
 
 	"github.com/javierlopezdeancos/antiqvvs/config"
 )
 
+func loadEnv() error {
+	err := godotenv.Load(path.Join("./", ".env"))
+
+	if err != nil {
+		return err
+	}
+
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+
+	if stripe.Key == "" {
+		panic("STRIPE_SECRET_KEY must be in environment")
+	}
+
+	return nil
+}
+
 func createData() error {
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+
+	if stripe.Key == "" {
+		panic("STRIPE_SECRET_KEY must be in environment")
+	}
+
 	err := createProducts()
 
 	if err != nil {
-		return fmt.Errorf("setup: error creating products: %v", err)
+		return err
 	}
 
 	err = createPrices()
 
 	if err != nil {
-		return fmt.Errorf("setup: error creating prices: %v", err)
+		return err
 	}
 
 	return nil
@@ -87,27 +112,34 @@ func createProducts() error {
 
 func createPrices() error {
 	params := &stripe.PriceParams{
-		ID:       stripe.String("price-wine-bottle-75cl-cristal-3-ases-hocicon"),
-		Currency: stripe.String(string(config.Default().Currency)),
-		Product:  stripe.String("product-wine-bottle-75cl-cristal-3-ases-hocicon"),
-		Recurring: &stripe.PriceRecurringParams{
-			Interval: stripe.String("month"),
-		},
-		UnitAmount: stripe.Int64(2000),
+		Nickname:   stripe.String("price-wine-bottle-75cl-cristal-3-ases-hocicon"),
+		Currency:   stripe.String(string(config.Default().Currency)),
+		Product:    stripe.String("product-wine-bottle-75cl-cristal-3-ases-hocicon"),
+		UnitAmount: stripe.Int64(1074),
 	}
 
-	price.New(params)
+	_, err := price.New(params)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func main() {
-	err := createData()
+	err := loadEnv()
+
+	if err != nil {
+		panic(fmt.Sprintf("error loading .env: %v", err))
+	}
+
+	err = createData()
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println("Stripe was configure")
+	fmt.Println("Quantvm Stripe eCommerce was configure")
 }
