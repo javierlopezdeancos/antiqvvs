@@ -1,0 +1,32 @@
+[
+	{
+		"id": "product-wine-bottle-75cl-cristal-3-ases-hocicon",
+		"images": [
+			"https://www.quantvm.es/static/bb79783b30547b1d4e4cd2d799349e86/b3779/hocicon.png",
+			"hocicon-big.png",
+			"hocicon-medium.png",
+			"hocicon-small.png"
+		],
+		"name": "Hocicón",
+		"url": "https://www.quantvm.es/vinos/3ases/hocicon",
+		"livemode": false,
+		"active": true,
+		"unit_label": "botella",
+		"metadata": {
+			"brandImage": "brand.jpg",
+			"capacity": "75cl",
+			"cellar": "3 Ases",
+			"cellarUrl": "https://www.3asesvino.com",
+			"color": "Rosado",
+			"cork": "Cristal",
+			"do": "Ribera de Duero",
+			"doImage": "ribera-duero.jpg",
+			"graduation": "13,5º",
+			"grape": "100% Tempranillo",
+			"path": "/vinos/3ases/hocicon",
+			"placeholderImage": "placeholder.png",
+			"where": "Ribera de Duero",
+			"barrel": "8 meses de crianza sobre lías"
+		}
+	}
+]

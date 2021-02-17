@@ -1,145 +1,75 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"os"
-	"path"
 
-	"github.com/joho/godotenv"
-	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/price"
-	"github.com/stripe/stripe-go/v72/product"
-
-	"github.com/javierlopezdeancos/antiqvvs/config"
+	"github.com/javierlopezdeancos/antiqvvs/delete"
+	"github.com/javierlopezdeancos/antiqvvs/environment"
+	"github.com/javierlopezdeancos/antiqvvs/populate"
 )
 
-func loadEnv() error {
-	err := godotenv.Load(path.Join("./", ".env"))
-
-	if err != nil {
-		return err
-	}
-
-	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
-
-	if stripe.Key == "" {
-		panic("STRIPE_SECRET_KEY must be in environment")
-	}
-
-	return nil
+// Actions param from cli
+var Actions = map[string]string{
+	"delete":   "delete",
+	"populate": "populate",
 }
 
-func createData() error {
-	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
-
-	if stripe.Key == "" {
-		panic("STRIPE_SECRET_KEY must be in environment")
-	}
-
-	err := createProducts()
-
-	if err != nil {
-		return err
-	}
-
-	err = createPrices()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func createProducts() error {
-	paramses := []*stripe.ProductParams{
-		{
-			ID: stripe.String("product-wine-bottle-75cl-cristal-3-ases-hocicon"),
-			Images: []*string{
-				stripe.String("hocicon-big.png"),
-				stripe.String("hocicon-medium.png"),
-				stripe.String("hocicon-small.png"),
-			},
-			Name: stripe.String("Hocicón"),
-			Type: stripe.String(string(stripe.ProductTypeGood)),
-			URL:  stripe.String("https://www.quantvm.es/vinos/3ases/hocicon"),
-		},
-	}
-
-	metadatases := []map[string]string{
-		{
-			"barrel":      "8 meses de crianza sobre lías",
-			"brandImage":  "brand.jpg",
-			"capacity":    "75cl",
-			"cellar":      "3 Ases",
-			"cellarUrl":   "https://www.3asesvino.com",
-			"color":       "Rosado",
-			"cork":        "Cristal",
-			"do":          "Ribera de Duero",
-			"doImage":     "ribera-duero.jpg",
-			"graduation":  "13,5º",
-			"grape":       "100% Tempranillo",
-			"placeholder": "placeholder.png",
-			"name":        "Hocicón",
-			"path":        "/vinos/3ases/hocicon",
-			"where":       "Ribera de Duero",
-		},
-	}
-
-	for p := 0; p < len(paramses); p++ {
-		params := paramses[p]
-		metadata := metadatases[p]
-
-		for key, value := range metadata {
-			params.AddMetadata(key, value)
-		}
-
-		_, err := product.New(params)
-
-		if err != nil {
-			stripeErr, ok := err.(*stripe.Error)
-
-			if ok && stripeErr.Code == "resource_already_exists" {
-				// This is fine — we expect this to be idempotent.
-			} else {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
-func createPrices() error {
-	params := &stripe.PriceParams{
-		Nickname:   stripe.String("price-wine-bottle-75cl-cristal-3-ases-hocicon"),
-		Currency:   stripe.String(string(config.Default().Currency)),
-		Product:    stripe.String("product-wine-bottle-75cl-cristal-3-ases-hocicon"),
-		UnitAmount: stripe.Int64(1074),
-	}
-
-	_, err := price.New(params)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+// Resources param from cli
+var Resources = map[string]string{
+	"wines":  "wines",
+	"prices": "prices",
 }
 
 func main() {
-	err := loadEnv()
+	err := environment.LoadEnv()
 
 	if err != nil {
-		panic(fmt.Sprintf("error loading .env: %v", err))
+		panic(fmt.Sprintf("🔴 [ERROR] loading .env: %v", err))
 	}
 
-	err = createData()
+	action := flag.String("action", "", "a string")
+	resource := flag.String("resource", "", "a string")
 
-	if err != nil {
-		fmt.Println(err)
-		return
+	flag.Parse()
+
+	if *action == Actions["delete"] {
+		fmt.Println("\n🔵 [INFO] Starting delete all wines in stripe...")
+
+		err = delete.Start()
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	} else if *action == Actions["populate"] {
+		fmt.Println("\n🔵 [INFO] Starting populate products from JSON...")
+
+		if *resource == Resources["prices"] {
+			err = populate.CreatePrices()
+
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			return
+		}
+
+		if *resource == Resources["wines"] {
+			err = populate.CreateWines()
+
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			return
+		}
+
+		err = populate.Start()
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	} else {
+		fmt.Println("🔴 [ERROR] You need pass an action as param like populate or delete")
 	}
-
-	fmt.Println("Quantvm Stripe eCommerce was configure")
 }
