@@ -11,44 +11,11 @@ import (
 
 	"github.com/javierlopezdeancos/antiqvvs/config"
 	"github.com/javierlopezdeancos/antiqvvs/environment"
+	winePrice "github.com/javierlopezdeancos/antiqvvs/price"
+	"github.com/javierlopezdeancos/antiqvvs/wine"
 )
 
-// Metadata properties to wine
-type Metadata struct {
-	Barrel           string `json:"barrel"`
-	BrandImage       string `json:"brandImage"`
-	Capacity         string `json:"capacity"`
-	Cellar           string `json:"cellar"`
-	CellarURL        string `json:"cellarURL"`
-	Color            string `json:"color"`
-	Cork             string `json:"cork"`
-	Do               string `json:"do"`
-	DoImage          string `json:"doImage"`
-	Graduation       string `json:"graduation"`
-	Grape            string `json:"grape"`
-	PlaceholderImage string `json:"placeholderImage"`
-	Path             string `json:"path"`
-	Where            string `json:"where"`
-}
-
-// Wine type
-type Wine struct {
-	ID       string   `json:"id"`
-	Images   []string `json:"images"`
-	Name     string   `json:"name"`
-	URL      string   `json:"url"`
-	Metadata Metadata `json:"metadata"`
-}
-
-// Price type
-type Price struct {
-	Nickname   string `json:"nickname"`
-	Currency   string `json:"currency"`
-	Product    string `json:"product"`
-	UnitAmount int64  `json:"unitAmount"`
-}
-
-func getWinesFromLocalJSON() ([]Wine, error) {
+func getWinesFromLocalJSON() ([]wine.Structure, error) {
 	var winesJSONFilePath string
 
 	if environment.Config.EnvType == environment.Types["test"] {
@@ -65,7 +32,7 @@ func getWinesFromLocalJSON() ([]Wine, error) {
 		return nil, err
 	}
 
-	var wines []Wine
+	var wines []wine.Structure
 
 	err = json.Unmarshal(winesData, &wines)
 
@@ -76,7 +43,7 @@ func getWinesFromLocalJSON() ([]Wine, error) {
 	return wines, nil
 }
 
-func getPricesFromLocalJSON() ([]Price, error) {
+func getPricesFromLocalJSON() ([]winePrice.Structure, error) {
 	var pricesJSONFilePath string
 
 	if environment.Config.EnvType == environment.Types["test"] {
@@ -93,7 +60,7 @@ func getPricesFromLocalJSON() ([]Price, error) {
 		return nil, err
 	}
 
-	var prices []Price
+	var prices []winePrice.Structure
 
 	err = json.Unmarshal(pricesJSON, &prices)
 

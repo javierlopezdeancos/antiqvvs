@@ -7,18 +7,22 @@ import (
 	"github.com/javierlopezdeancos/antiqvvs/delete"
 	"github.com/javierlopezdeancos/antiqvvs/environment"
 	"github.com/javierlopezdeancos/antiqvvs/populate"
+	"github.com/javierlopezdeancos/antiqvvs/update"
 )
 
 // Actions param from cli
 var Actions = map[string]string{
 	"delete":   "delete",
 	"populate": "populate",
+	"update":   "update",
 }
 
 // Resources param from cli
 var Resources = map[string]string{
 	"wines":  "wines",
 	"prices": "prices",
+	"wine":   "wine",
+	"price":  "price",
 }
 
 func main() {
@@ -52,9 +56,7 @@ func main() {
 			}
 
 			return
-		}
-
-		if *resource == Resources["wines"] {
+		} else if *resource == Resources["wines"] {
 			err = populate.CreateWines()
 
 			if err != nil {
@@ -65,6 +67,30 @@ func main() {
 		}
 
 		err = populate.Start()
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	} else if *action == Actions["update"] {
+		if *resource == Resources["price"] {
+			err = update.Price()
+
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			return
+		} else if *resource == Resources["wine"] {
+			err = update.Wine()
+
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			return
+		}
+
+		err = update.Start()
 
 		if err != nil {
 			fmt.Println(err)

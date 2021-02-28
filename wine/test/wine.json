@@ -1,0 +1,31 @@
+{
+  "active": true,
+  "attributes": [],
+  "caption": "",
+  "created": 1613300280,
+  "deactivate_on": [],
+  "description": "",
+  "id": "product-wine-bottle-75cl-cristal-ibicea-flor",
+  "images": [
+    "https://files.stripe.com/links/fl_test_ilEXFkNls5LMHfbVC2ivEa3j"
+  ],
+  "livemode": false,
+  "metadata": {
+    "barrel": "Crianza bajo velo de flor 3 meses",
+    "brandImage": "brand.jpg",
+    "cellar": "Ibicea",
+    "cellarUrl": "https://www.ibicea.es/",
+    "color": "Blanco con crianza",
+    "do": "Quintanar de la Orden",
+    "grape": "100% Malvasía blanca de Candia",
+    "placeholderImage": "bottle-placeholder.jpg"
+  },
+  "name": "Flor",
+  "package_dimensions": null,
+  "shippable": true,
+  "statement_descriptor": "",
+  "type": "good",
+  "unit_label": "",
+  "url": "https://www.quantvm.es/vinos/ibicea/flor",
+  "updated": 1613590601
+}
